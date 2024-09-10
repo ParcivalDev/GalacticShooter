@@ -84,9 +84,4 @@ while running:
     pygame.display.flip() # Actualiza la pantalla
     clock.tick(60)
 
-    
-    
-    
-
-
-pygame.quit()
+ pygame.quit()
