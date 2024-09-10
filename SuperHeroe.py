@@ -35,6 +35,20 @@ obstacle_height = 30
 obstacle_color = RED
 obstacles = [] # Inicialmente no hay ningún meteorito en la lista
 
+
+# Cargar imágenes
+background_img = pygame.image.load("fondo_espacio.jpg")
+player_img = pygame.image.load("player.png")
+obstacle_img = pygame.image.load("enemigo.jpg")
+
+player_img = pygame.transform.scale(player_img,(70,70))
+obstacle_img = pygame.transform.scale(obstacle_img,(40,40))
+
+
+# Puntuación
+score = 0
+font = pygame.font.Font(None, 24)
+
 # Reloj para controlar FPS
 clock = pygame.time.Clock()
 
@@ -62,7 +76,7 @@ while running:
     # Generación de obstáculos de manera random
     if len(obstacles)<8:
         obstacle = pygame.Rect(random.randint(0,WIDTH - obstacle_width), 0, obstacle_width, obstacle_height) 
-        velocidad = random.randint(2,7)
+        velocidad = random.randint(5,10)
         # Para que no genere obstáculos cortados en el eje X
         obstacles.append((obstacle,velocidad)) # Se guarda cada obstáculo con su velocidad
     
@@ -72,16 +86,33 @@ while running:
         obstacle.y += velocidad
         if obstacle.top > HEIGHT:
             obstacles.remove(obstacle_info) # Cuando los obstáculos pasen del alto de la ventana estos desaparecen de la lista y así se generan unos nuevos
+            score += 1 # Para aumentar la puntuación
+    
+    # Detectar colisiones
+    for obstacle_info in obstacles:
+        obstacle, _ = obstacle_info
+        if player.colliderect(obstacle):
+            print("¡Colisión detectada!")
+            running = False
     
     
     screen.fill(BLACK) # Pinta la pantalla
-    pygame.draw.rect(screen, player_color, player) # Dibuja el jugador
+    screen.blit(background_img, (0,0)) # Imagen de fondo. Se coloca de primero para no tapar el contenido
+    
+    
+    #pygame.draw.rect(screen, player_color, player) # Dibuja el jugador
+    screen.blit(player_img, player)
     
     for obstacle_info in obstacles:
         obstacle, _ = obstacle_info # Ignoramos la velocidad con guión bajo
-        pygame.draw.rect(screen, obstacle_color, obstacle) # Dibuja los obstáculos
+        #pygame.draw.rect(screen, obstacle_color, obstacle) # Dibuja los obstáculos
+        screen.blit(obstacle_img,obstacle)
+        
+    # Mostrar puntuación
+    score_text = font.render(f"Puntuación: {score}", True, WHITE)  # True para que no salga pixelado
+    screen.blit(score_text, (10,10))
     
     pygame.display.flip() # Actualiza la pantalla
     clock.tick(60)
 
- pygame.quit()
+pygame.quit()
