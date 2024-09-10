@@ -60,30 +60,28 @@ while running:
         
         
     # Generación de obstáculos de manera random
-    # Función para generar obstáculos
-    def generate_obstacle():
-        x_position = random.randint(0, WIDTH - obstacle_width)
-        y_position = random.randint(-100, -40)  # Aparecen fuera de la pantalla
-        obstacle_rect = pygame.Rect(x_position, y_position, obstacle_width, obstacle_height)
-        return obstacle_rect
+    if len(obstacles)<8:
+        obstacle = pygame.Rect(random.randint(0,WIDTH - obstacle_width), 0, obstacle_width, obstacle_height) 
+        velocidad = random.randint(2,7)
+        # Para que no genere obstáculos cortados en el eje X
+        obstacles.append((obstacle,velocidad)) # Se guarda cada obstáculo con su velocidad
     
-    # Generar obstáculos (máximo 5)
-    if len(obstacles) < 5:
-        obstacles.append(generate_obstacle())
-
-    # Mover los obstáculos hacia abajo
-    for obstacle in obstacles:
-        obstacle.y += 5  # Velocidad de caída
-        if obstacle.y > HEIGHT:  # Si sale de la pantalla, lo removemos
-            obstacles.remove(obstacle)
-   
-        
+    # Mover los obstáculos
+    for obstacle_info in obstacles:
+        obstacle, velocidad = obstacle_info # Desempaqueta la tupla en dos variables
+        obstacle.y += velocidad
+        if obstacle.top > HEIGHT:
+            obstacles.remove(obstacle_info) # Cuando los obstáculos pasen del alto de la ventana estos desaparecen de la lista y así se generan unos nuevos
+    
+    
     screen.fill(BLACK) # Pinta la pantalla
-    pygame.draw.rect(screen, player_color, player) # Dibuja el jugador como un rectángulo rojo
-     # Dibujar los obstáculos
-    for obstacle in obstacles:
-        pygame.draw.rect(screen, obstacle_color, obstacle)
+    pygame.draw.rect(screen, player_color, player) # Dibuja el jugador
+    
+    for obstacle_info in obstacles:
+        obstacle, _ = obstacle_info # Ignoramos la velocidad con guión bajo
+        pygame.draw.rect(screen, obstacle_color, obstacle) # Dibuja los obstáculos
+    
     pygame.display.flip() # Actualiza la pantalla
     clock.tick(60)
 
-pygame.quit()
+ pygame.quit()
