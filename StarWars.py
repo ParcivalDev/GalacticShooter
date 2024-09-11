@@ -16,6 +16,7 @@ pygame.display.set_caption("Star Wars")
 BLACK = (0,0,0)
 WHITE = (255,255,255)
 RED = (255,0,0)
+GREEN = (64, 255, 0)
 
 # Jugador
 player_width = 50
@@ -33,16 +34,25 @@ obstacle_width = 30
 obstacle_height = 30
 obstacles = [] # Inicialmente no hay ningún meteorito en la lista
 
+# Balas (Disparos)
+bullets = []
+bullet_width = 3
+bullet_height = 7
+bullet_speed = -10
 
 # Cargar imágenes
 background_img = pygame.image.load("fondo_espacio.jpg")
 player_img = pygame.image.load("player.png")
 obstacle_img = pygame.image.load("enemigo.jpg")
+power_up_img = pygame.image.load("power_up.png")
+explosion_img = pygame.image.load("explosion.png")
+
 
 # Ajustar tamño de las imágenenes
 player_img = pygame.transform.scale(player_img,(70,70))
 obstacle_img = pygame.transform.scale(obstacle_img,(40,40))
-
+power_up_img = pygame.transform.scale(power_up_img, (30, 30))
+explosion_img = pygame.transform.scale(explosion_img, (50, 50))
 
 # Puntuación
 score = 0
@@ -116,6 +126,20 @@ while running:
         # Una vez que el borde inferior del jugador toca o supera el límite establecido (HEIGHT - 10), el jugador se detiene y no puede moverse más abajo
         
     
+     # Disparar balas con la tecla espacio
+    if keys[pygame.K_SPACE]:
+        bullet = pygame.Rect(player.centerx - bullet_width // 2, player.top, bullet_width, bullet_height)
+        bullets.append(bullet)
+
+    # Mover las balas
+    for bullet in bullets:
+        bullet.y += bullet_speed
+        if bullet.bottom < 0:
+            bullets.remove(bullet)  # Eliminar balas que salen de la pantalla
+    
+    
+    
+    
     # Generación de obstáculos de manera random
     if len(obstacles)<max_obstacles:
         obstacle = pygame.Rect(random.randint(0,WIDTH - obstacle_width), 0, obstacle_width, obstacle_height) 
@@ -158,7 +182,16 @@ while running:
                 game_over()
                 running = False  # Terminar el juego
                 
-                
+    
+     # Detectar colisiones entre balas y obstáculos
+    for bullet in bullets:
+        for obstacle_info in obstacles:
+            obstacle, _ = obstacle_info
+            if bullet.colliderect(obstacle):
+                bullets.remove(bullet)
+                obstacles.remove(obstacle_info)
+                score += 1  # Incrementar la puntuación cuando se destruye un obstáculo
+                break         
     
     screen.blit(background_img, (0,0)) # Imagen de fondo. Se coloca de primero para no tapar el contenido
    # Actualizar el fondo
@@ -176,6 +209,11 @@ while running:
     # score_text = font.render(f"Puntuación: {score}", True, WHITE)  # True para que no salga pixelado
     # screen.blit(score_text, (10,10))
     
+    # Dibuja las balas
+    for bullet in bullets:
+        pygame.draw.rect(screen, GREEN, bullet)
+        
+        
     # Mostrar puntuación y vidas
     draw_text(f"Puntuación: {score}", font, WHITE, 10, 10)
     draw_text(f"Vidas: {lives}", font, RED, 10, 30)
