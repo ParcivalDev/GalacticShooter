@@ -5,9 +5,7 @@ import random
 pygame.init()
 
 # Configurar la pantalla
-WIDTH = 800  # ancho
-HEIGHT = 600 # alto
-
+WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("Star Wars")
 
@@ -39,6 +37,16 @@ bullets = []
 bullet_width = 3
 bullet_height = 7
 bullet_speed = -10
+last_shot_time = 0
+shoot_delay = 200  # Retraso de disparo en milisegundos
+
+# Power-up
+power_up = None
+power_up_active = False
+power_up_duration = 5000
+power_up_start_time = 0
+power_up_health_increase = 25  # Aumento de salud al recoger un power-up
+
 
 # Cargar imágenes
 background_img = pygame.image.load("fondo_espacio.jpg")
@@ -60,24 +68,55 @@ high_score = 0 # Puntuación más alta
 font = pygame.font.Font(None, 24)
 #--------------------------------------------------
 # Vidas del jugador
-lives = 3
+max_health = 100
+current_health = max_health
+
+# Variables del juego
+max_obstacles = 4
+level = 1
+score_to_next_level = 50
+explosions = []  # Para manejar las explosiones
+running = True
+paused = False
+game_over_screen = False
+explosion_duration = 300  # Duración en milisegundos
+
 
 # Música de fonndo y efectos de sonido
 pygame.mixer.music.load("hysteria.mp3") #####O MIXER_MUSIC???
 pygame.mixer.music.play(-1) # Repite la canción infinitas veces
 collision_sound = pygame.mixer.Sound("collision.mp3")
+explosion_sound = pygame.mixer.Sound("explosion.mp3")
+
+
 #--------------------------------------------------
 # Reloj para controlar FPS 
 clock = pygame.time.Clock()
 
 #--------------------------------------------------
-# Variables para controlar la dificultad y el fondo animado
-difficulty_increment_score = 40
-max_obstacles = 4  # Empieza con 2
-# Variable para recordar el puntaje en el que la dificultad aumentó por última vez
-last_difficulty_increase = 0
-# Pausar el juego
-paused = False
+
+def start_menu():
+    """Pantalla de inicio del juego."""
+    menu_running = True
+    while menu_running:
+        screen.fill(BLACK)
+        draw_text("Star Wars", font, WHITE, WIDTH//2 - 50, HEIGHT//2 - 50)
+        draw_text("Presiona 'S' para iniciar", font, WHITE, WIDTH // 2 - 100, HEIGHT // 2)
+        draw_text("Presiona 'Q' para salir", font, WHITE, WIDTH // 2 - 100, HEIGHT // 2 + 40)
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    menu_running = False
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    return False
+    return True
+
 
 def draw_text(text, font, color, x, y):
     """Función para dibujar texto en pantalla."""
@@ -88,12 +127,38 @@ def game_over():
     """Pantalla de Game Over."""
     screen.fill(BLACK)
     draw_text(f"Game Over! Puntuación: {score}", font, RED, WIDTH//2 - 100, HEIGHT//2)
+    draw_text("Presiona 'R' para reiniciar o 'Q' para salir", font, WHITE, WIDTH // 2 - 150, HEIGHT // 2 + 40)
     pygame.display.flip()
-    pygame.time.wait(3000)  # Espera 3 segundos antes de cerrar el juego
+    # pygame.time.wait(3000)  # Espera 3 segundos antes de cerrar el juego
 #--------------------------------------------------
+def draw_health_bar(screen, x, y, health, max_health):
+    bar_width = 100
+    bar_height = 10
+    fill = (health / max_health) * bar_width
+    outline_rect = pygame.Rect(x, y, bar_width, bar_height)
+    fill_rect = pygame.Rect(x, y, fill, bar_height)
+    pygame.draw.rect(screen, RED, fill_rect)
+    pygame.draw.rect(screen, WHITE, outline_rect, 2)
 
-# Bucle principal del juego para que la ventana no se cierre
-running = True
+def restart_game():
+    global player, bullets, obstacles, score, current_health, level, max_obstacles, power_up_active
+    player.x = WIDTH // 2 - player_width // 2
+    player.y = HEIGHT - player_height - 10
+    bullets.clear()
+    obstacles.clear()
+    score = 0
+    current_health = max_health
+    level = 1
+    max_obstacles = 4
+    power_up_active = False
+
+
+#-----------------------
+
+# Mostrar la pantalla de inicio
+if not start_menu():
+    running = False
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:  # .quit no es un tipo de evento. Es una función
@@ -103,6 +168,17 @@ while running:
 
     keys = pygame.key.get_pressed() # Tecla que ha sido presionada
 #--------------------------------------------------
+# Pantalla de Game Over
+    if game_over_screen:
+        game_over()
+        if keys[pygame.K_r]:
+            game_over_screen = False
+            restart_game()
+        if keys[pygame.K_q]:
+            running = False
+        continue
+    
+    
     # Pausar el juego correctamente
     if keys[pygame.K_p]:
         pygame.time.wait(300)  # Esperar 300 ms para evitar múltiples cambios rápidos
@@ -127,9 +203,10 @@ while running:
         
     
      # Disparar balas con la tecla espacio
-    if keys[pygame.K_SPACE]:
+    if keys[pygame.K_SPACE] and pygame.time.get_ticks() - last_shot_time > shoot_delay:
         bullet = pygame.Rect(player.centerx - bullet_width // 2, player.top, bullet_width, bullet_height)
         bullets.append(bullet)
+        last_shot_time = pygame.time.get_ticks()
 
     # Mover las balas
     for bullet in bullets:
@@ -139,7 +216,7 @@ while running:
     
     
     
-    
+        
     # Generación de obstáculos de manera random
     if len(obstacles)<max_obstacles:
         obstacle = pygame.Rect(random.randint(0,WIDTH - obstacle_width), 0, obstacle_width, obstacle_height) 
@@ -162,25 +239,34 @@ while running:
     #         print("¡Colisión detectada!")
     #         running = False
     
-      # Aumentar dificultad con la puntuación
-    if score >= last_difficulty_increase + difficulty_increment_score:
-        max_obstacles += 1
-        last_difficulty_increase = score  # Actualiza el último puntaje en el que se incrementó la dificultad
-        for i in range(len(obstacles)):
-            obstacles[i] = (obstacles[i][0], obstacles[i][1] + 1)  # Aumentar velocidad de los obstáculos
+    #   # Aumentar dificultad con la puntuación
+    # if score >= last_difficulty_increase + difficulty_increment_score:
+    #     max_obstacles += 1
+    #     last_difficulty_increase = score  # Actualiza el último puntaje en el que se incrementó la dificultad
+    #     for i in range(len(obstacles)):
+    #         obstacles[i] = (obstacles[i][0], obstacles[i][1] + 1)  # Aumentar velocidad de los obstáculos
 
+# Aumentar nivel
+    if score >= score_to_next_level:
+        level += 1
+        max_obstacles += 2
+        score_to_next_level += 50 * level
+        
+        
     # Detectar colisiones
     for obstacle_info in obstacles:
         obstacle, _ = obstacle_info
         if player.colliderect(obstacle):
             collision_sound.play()  # Reproducir sonido de colisión
-            lives -= 1  # Restar una vida
+            #lives -= 1  # Restar una vida
+            current_health -= 20
+
             obstacles.remove(obstacle_info)  # Eliminar obstáculo que choca
-            if lives == 0:
+            if current_health <= 0:
                 if score > high_score:
                     high_score = score  # Actualizar la puntuación más alta
-                game_over()
-                running = False  # Terminar el juego
+                # running = False  # Terminar el juego
+                game_over_screen = True
                 
     
      # Detectar colisiones entre balas y obstáculos
@@ -191,8 +277,29 @@ while running:
                 bullets.remove(bullet)
                 obstacles.remove(obstacle_info)
                 score += 1  # Incrementar la puntuación cuando se destruye un obstáculo
+                explosion_sound.play()
+                # explosions.append([explosion_img, obstacle.center])
+                explosions.append([explosion_img, obstacle.center, pygame.time.get_ticks()])
+
                 break         
     
+    
+     # Generar power-up aleatoriamente
+    if power_up is None and random.randint(0, 1000) < 5:  # Probabilidad baja
+        power_up = pygame.Rect(random.randint(0, WIDTH - 30), random.randint(0, HEIGHT - 30), 30, 30)
+
+    # Colisión con power-up
+    if power_up and player.colliderect(power_up):
+        power_up_active = True
+        power_up_start_time = pygame.time.get_ticks()
+        current_health = min(max_health, current_health + power_up_health_increase)  # Aumenta vida sin exceder el máximo
+        power_up = None
+
+    # Verificar si el power-up ha expirado
+    if power_up_active and pygame.time.get_ticks() - power_up_start_time > power_up_duration:
+        power_up_active = False
+        
+        
     screen.blit(background_img, (0,0)) # Imagen de fondo. Se coloca de primero para no tapar el contenido
    # Actualizar el fondo
 
@@ -213,12 +320,28 @@ while running:
     for bullet in bullets:
         pygame.draw.rect(screen, GREEN, bullet)
         
+     # Dibujar power-up
+    if power_up:
+        screen.blit(power_up_img, power_up)
+        
+    for explosion in explosions[:]:
+        img, pos, time = explosion
+        if pygame.time.get_ticks() - time > explosion_duration:
+            explosions.remove(explosion)
+        else:
+            screen.blit(img, pos)
         
     # Mostrar puntuación y vidas
+    # draw_text(f"Puntuación: {score}", font, WHITE, 10, 10)
+    # draw_text(f"Vidas: {lives}", font, RED, 10, 30)
+    # draw_text(f"Puntuación más alta: {high_score}", font, WHITE, 10, 50)
+    # Mostrar puntuación y nivel
     draw_text(f"Puntuación: {score}", font, WHITE, 10, 10)
-    draw_text(f"Vidas: {lives}", font, RED, 10, 30)
+    draw_text(f"Nivel: {level}", font, WHITE, 10, 30)
     draw_text(f"Puntuación más alta: {high_score}", font, WHITE, 10, 50)
 
+    # Mostrar barra de vida
+    draw_health_bar(screen, 10, 70, current_health, max_health)
     
     pygame.display.flip() # Actualiza la pantalla
     clock.tick(60)
