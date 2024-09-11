@@ -100,7 +100,7 @@ def start_menu():
     menu_running = True
     while menu_running:
         screen.fill(BLACK)
-        draw_text("Star Wars", font, WHITE, WIDTH//2 - 50, HEIGHT//2 - 50)
+        draw_text("Galactic Gunner", font, WHITE, WIDTH//2 - 50, HEIGHT//2 - 50)
         draw_text("Presiona 'S' para iniciar", font, WHITE, WIDTH // 2 - 100, HEIGHT // 2)
         draw_text("Presiona 'Q' para salir", font, WHITE, WIDTH // 2 - 100, HEIGHT // 2 + 40)
         pygame.display.flip()
