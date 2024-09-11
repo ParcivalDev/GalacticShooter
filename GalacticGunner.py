@@ -7,7 +7,7 @@ pygame.init()
 # Configurar la pantalla
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption("Star Wars")
+pygame.display.set_caption("Galactic Gunner")
 
 
 # Colores
