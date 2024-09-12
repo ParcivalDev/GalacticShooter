@@ -49,11 +49,11 @@ power_up_health_increase = 25  # Aumento de salud al recoger un power-up
 
 
 # Cargar imágenes
-background_img = pygame.image.load("fondo_espacio.jpg")
-player_img = pygame.image.load("player.png")
-obstacle_img = pygame.image.load("enemigo.jpg")
-power_up_img = pygame.image.load("power_up.png")
-explosion_img = pygame.image.load("explosion.png")
+background_img = pygame.image.load("assets/fondo_espacio.jpg")
+player_img = pygame.image.load("assets/player.png")
+obstacle_img = pygame.image.load("assets/enemigo.jpg")
+power_up_img = pygame.image.load("assets/power_up.png")
+explosion_img = pygame.image.load("assets/explosion.png")
 
 
 # Ajustar tamño de las imágenenes
@@ -83,10 +83,10 @@ explosion_duration = 300  # Duración en milisegundos
 
 
 # Música de fonndo y efectos de sonido
-pygame.mixer.music.load("hysteria.mp3") #####O MIXER_MUSIC???
+pygame.mixer.music.load("assets/hysteria.mp3") #####O MIXER_MUSIC???
 pygame.mixer.music.play(-1) # Repite la canción infinitas veces
-collision_sound = pygame.mixer.Sound("collision.mp3")
-explosion_sound = pygame.mixer.Sound("explosion.mp3")
+collision_sound = pygame.mixer.Sound("assets/collision.mp3")
+explosion_sound = pygame.mixer.Sound("assets/explosion.mp3")
 
 
 #--------------------------------------------------
