@@ -1,3 +1,8 @@
+"""
+Galactic Shooter - Un juego de disparos en 2D
+Autor: ParcivalDev
+"""
+
 import os  # Módulo para interactuar con el sistema de archivos
 import sys  # Módulo para interactuar con el intérprete del sistema
 import pygame  # Módulo para manejar gráficos y sonidos en videojuegos
@@ -51,6 +56,13 @@ player_img_data = get_resource_data('assets/player.png')
 obstacle_img_data = get_resource_data('assets/enemigo.jpg')
 life_heart_img_data = get_resource_data('assets/life_heart.png')
 explosion_img_data = get_resource_data('assets/explosion.png')
+
+
+# Cargar y establecer el icono
+icon_data = get_resource_data('assets/player.png')  # Reemplaza con la ruta a tu imagen de icono
+icon_image = load_image_from_data(icon_data)  # Convertir datos binarios en una superficie
+icon_image = pygame.transform.scale(icon_image, (32, 32))  # Escalar a 32x32 píxeles
+pygame.display.set_icon(icon_image)  # Establecer la imagen como el ícono de la ventana
 
 # Cargar imágenes desde los datos binarios
 start_img = load_image_from_data(start_img_data)
