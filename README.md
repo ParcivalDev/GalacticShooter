@@ -22,8 +22,6 @@
 1. **Descarga el juego:** [Enlace de descarga en itch.io](https://parcivaldev.itch.io/galacticshooter)
 2. **Ejecución:** Ejecuta el archivo `.exe`.
    
-   Si es necesario, asegúrate de tener las librerías necesarias instaladas, como [Pygame](https://www.pygame.org/news).
-
 ## Capturas de pantalla
 <p align="center">
   <img src="assets/start.png" alt="Pantalla de inicio" width="250"/>
