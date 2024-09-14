@@ -4,7 +4,7 @@
 
 # Galactic Shooter  :rocket:	 :space_invader:	
 
-**Galactic Shooter** es un juego de disparos en 2D donde controlas una nave espacial para destruir enemigos en el espacio mientras intentas sobrevivir el mayor tiempo posible. Enfréntate a oleadas de enemigos y trata de conseguir la mayor puntuación posible. ¡Buena suerte, piloto espacial!
+**Galactic Shooter** es un minijuego en 2D donde controlas una nave espacial, con el fin de destruir enemigos, mientras intentas sobrevivir el mayor tiempo posible. Enfréntate a oleadas de enemigos y trata de conseguir la mayor puntuación. ¡Buena suerte, piloto!
 
 
 ## Características
@@ -12,7 +12,7 @@
 - **Género:** Juego de disparos en 2D.
 - **Modo de juego:** Sobrevive el mayor tiempo posible enfrentándote a enemigos que aparecen en pantalla.
 - **Controles:**
-  - Usa las teclas de flecha o las teclas WASD para moverte.
+  - Usa las flechas o las teclas WASD para moverte.
   - Barra espaciadora para disparar.
     
 
