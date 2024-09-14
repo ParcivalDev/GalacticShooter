@@ -1,4 +1,6 @@
-![Pantalla de inicio](portada.png)
+<p align="center">
+  <img src="portada.png" alt="Pantalla de inicio" width="500"/>
+</p>
 
 # Galactic Shooter
 
@@ -23,11 +25,11 @@
    Si es necesario, asegúrate de tener las librerías necesarias instaladas, como [Pygame](https://www.pygame.org/news).
 
 ## Capturas de pantalla
-<div>
-    <img src="assets/start.png" alt="Pantalla de inicio" style="width: 300px; height: auto;">
-    <img src="juego.png" alt="En medio de una partida" style="width: 300px; height: auto;">
-    <img src="assets/game_over.png" alt="Pantalla de Game Over" style="width: 300px; height: auto;">
-</div>
+<p align="center">
+  <img src="assets/start.png" alt="Pantalla de inicio" width="250"/>
+  <img src="juego.png" alt="En medio de una partida" width="250"/>
+  <img src="assets/game_over.png" alt="Pantalla de Game Over" width="250"/>
+</p>
 
 
 > [!NOTE]
