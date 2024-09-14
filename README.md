@@ -2,7 +2,7 @@
   <img src="portada.png" alt="Pantalla de inicio" width="500"/>
 </p>
 
-# Galactic Shooter
+# Galactic Shooter  :rocket:	 :space_invader:	
 
 **Galactic Shooter** es un juego de disparos en 2D donde controlas una nave espacial para destruir enemigos en el espacio mientras intentas sobrevivir el mayor tiempo posible. Enfréntate a oleadas de enemigos y trata de conseguir la mayor puntuación posible. ¡Buena suerte, piloto espacial!
 
